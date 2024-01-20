@@ -1,0 +1,8 @@
+SELECT E.EmployeeID, E.LastName, E.FirstName, COALESCE(O.frequency, 0) AS OrderFrequency
+FROM Employees E
+LEFT JOIN (
+    SELECT EmployeeID, COUNT(*) AS frequency
+    FROM Orders
+    GROUP BY EmployeeID
+) O ON E.EmployeeID = O.EmployeeID
+ORDER BY O.frequency DESC;

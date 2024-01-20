@@ -1,0 +1,23 @@
+SELECT 
+    Employees.EmployeeID, 
+    Employees.LastName, 
+    Employees.FirstName, 
+    COUNT(DISTINCT Orders.OrderID) AS OrderCount
+FROM 
+    Employees
+LEFT JOIN 
+    Orders ON Employees.EmployeeID = Orders.EmployeeID
+LEFT JOIN 
+    OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+LEFT JOIN 
+    Products ON OrderDetails.ProductID = Products.ProductID
+LEFT JOIN 
+    Categories ON Products.CategoryID = Categories.CategoryID
+WHERE 
+    Categories.CategoryName = 'Beverages'
+GROUP BY 
+    Employees.EmployeeID, 
+    Employees.LastName, 
+    Employees.FirstName
+
+ORDER BY OrderCount DESC;
