@@ -1,0 +1,4 @@
+[root@quickstart cloudera]# mkdir -p /home/cloudera/covid_project/landing_zone/COVID_SRC_LZ/
+[root@quickstart cloudera]# hdfs dfs -mkdir -p /user/cloudera/ds/COVID_HDFS_LZ/
+[root@quickstart cloudera]# cp /media/sf_shared/covid-19.csv /home/cloudera/covid_project/landing_zone/COVID_SRC_LZ/
+[root@quickstart cloudera]# hdfs dfs -put /home/cloudera/covid_project/landing_zone/COVID_SRC_LZ/covid-19.csv /user/cloudera/ds/COVID_HDFS_LZ/

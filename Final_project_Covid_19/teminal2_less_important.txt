@@ -1,0 +1,293 @@
+[cloudera@quickstart ~]$ su root
+Password: 
+[root@quickstart cloudera]# ls
+cloudera-manager  Downloads                   lib       Templates
+cm_api.py         eclipse                     Music     Videos
+covid_project     enterprise-deployment.json  parcels   workspace
+Desktop           express-deployment.json     Pictures
+Documents         kerberos                    Public
+[root@quickstart cloudera]# cd /media/sf_shared/
+[root@quickstart sf_shared]# ls
+New Text Document.txt
+[root@quickstart sf_shared]# cat New\ Text\ Document.txt 
+echo "https://vault.centos.org/6.10/os/x86_64/" > /var/cache/yum/x86_64/6/base/mirrorlist.txt
+echo "http://vault.centos.org/6.10/extras/x86_64/" > /var/cache/yum/x86_64/6/extras/mirrorlist.txt
+echo "http://vault.centos.org/6.10/updates/x86_64/" > /var/cache/yum/x86_64/6/updates/mirrorlist.txt
+echo "http://vault.centos.org/6.10/sclo/x86_64/rh" > /var/cache/yum/x86_64/6/centos-sclo-rh/mirrorlist.txt
+echo "http://vault.centos.org/6.10/sclo/x86_64/sclo" > /var/cache/yum/x86_64/6/centos-sclo-sclo/mirrorlist.txt[root@quickstart sf_shared]# sh New\ Text\ Document.txt 
+New Text Document.txt: line 4: /var/cache/yum/x86_64/6/centos-sclo-rh/m: No such file or directory
+New Text Document.txt: line 5: /var/cache/yum/x86_64/6/centos-sclo-sclo/mirrorlist.txt: No such file or directory
+[root@quickstart sf_shared]# cat New\ Text\ Document.txt 
+echo "https://vault.centos.org/6.10/os/x86_64/" > /var/cache/yum/x86_64/6/base/mirrorlist.txt
+echo "http://vault.centos.org/6.10/extras/x86_64/" > /var/cache/yum/x86_64/6/extras/mirrorlist.txt
+echo "http://vault.centos.org/6.10/updates/x86_64/" > /var/cache/yum/x86_64/6/updates/mirrorlist.txt
+echo "http://vault.centos.org/6.10/sclo/x86_64/rh" > /var/cache/yum/x86_64/6/centos-sclo-rh/mirrorlist.txt
+echo "http://vault.centos.org/6.10/sclo/x86_64/sclo" > /var/cache/yum/x86_64/6/centos-sclo-sclo/mirrorlist.txt[root@quickstart sf_shared]# ech_64/" > /var/cache/yum/x86_64/6/base/mirrorlist.txt
+[root@quickstart sf_shared]# echo "http://vault.centos.org/6.10/extras/x86_64/" > /var/cache/yum/x86_64/6/extras/mirrorlist.txt
+[root@quickstart sf_shared]# echo "http://vault.centos.org/6.10/updates/x86_64/" > /var/cache/yum/x86_64/6/updates/mirrorlist.txt
+[root@quickstart sf_shared]# echo "http://vault.centos.org/6.10/sclo/x86_64/rh" > /var/cache/yum/x86_64/6/centos-sclo-rh/mirrorlist.txt
+bash: /var/cache/yum/x86_64/6/centos-sclo-rh/mirrorlist.txt: No such file or directory
+[root@quickstart sf_shared]# echo "http://vault.centos.org/6.10/sclo/x86_64/sclo" > /var/cache/yum/x86_64/6/centos-sclo-sclo/mirrorlist.txt
+bash: /var/cache/yum/x86_64/6/centos-sclo-sclo/mirrorlist.txt: No such file or directory
+[root@quickstart sf_shared]# hive
+
+Logging initialized using configuration in file:/etc/hive/conf.dist/hive-log4j.properties
+WARNING: Hive CLI is deprecated and migration to Beeline is recommended.
+hive> show tables;
+OK
+covidstats
+Time taken: 0.766 seconds, Fetched: 1 row(s)
+hive> CREATE TABLE IF NOT EXISTS covid_data.staging_table (
+    >     Country VARCHAR(255),
+    >     TotalCases INT,
+    >     ActiveCases INT,
+    >     DeathInClosedCases INT,
+    >     NewCases INT,
+    >     TotalDeaths INT,
+    >     NewDeaths INT,
+    >     TotalRecovered INT,
+    >     SeriousCritical INT,
+    >     DeathsPerMillion FLOAT,
+    >     TotalTests INT,
+    >     CasesPerMillion FLOAT,
+    >     RankByTestingRate INT,
+    >     RankByDeathRate INT,
+    >     RankByCasesRate INT,
+    >     TestsPerMillion FLOAT,
+    >     RankByDeathOfClosedCases INT
+    > )
+    > ROW FORMAT DELIMITED
+    > FIELDS TERMINATED BY '\t'
+    > STORED AS TEXTFILE;
+OK
+Time taken: 0.557 seconds
+hive> CREATE TABLE IF NOT EXISTS covid_data.orc_table (
+    >     TotalCases INT,
+    >     ActiveCases INT,
+    >     DeathInClosedCases INT,
+    >     NewCases INT,
+    >     TotalDeaths INT,
+    >     NewDeaths INT,
+    >     TotalRecovered INT,
+    >     SeriousCritical INT,
+    >     DeathsPerMillion FLOAT,
+    >     TotalTests INT,
+    >     CasesPerMillion FLOAT,
+    >     RankByTestingRate INT,
+    >     RankByDeathRate INT,
+    >     RankByCasesRate INT,
+    >     TestsPerMillion FLOAT,
+    >     RankByDeathOfClosedCases INT
+    > )
+    > PARTITIONED BY (Country STRING)
+    > STORED AS ORC;
+OK
+Time taken: 0.126 seconds
+hive> LOAD DATA INPATH '/user/cloudera/ds/COVID_HDFS_LZ/covid-19.csv' INTO TABLE covid_data.staging_table;
+FAILED: SemanticException Line 1:17 Invalid path ''/user/cloudera/ds/COVID_HDFS_LZ/covid-19.csv'': No files matching path hdfs://quickstart.cloudera:8020/user/cloudera/ds/COVID_HDFS_LZ/covid-19.csv
+hive> LOAD DATA INPATH '/user/cloudera/ds/COVID_HDFS_LZ/covid-19/csv' INTO TABLE covid_data.staging_table;
+FAILED: SemanticException Line 1:17 Invalid path ''/user/cloudera/ds/COVID_HDFS_LZ/covid-19/csv'': No files matching path hdfs://quickstart.cloudera:8020/user/cloudera/ds/COVID_HDFS_LZ/covid-19/csv
+hive> LOAD DATA INPATH '/user/cloudera/ds/COVID_HDFS_LZ/covid-19/csv' INTO TABLE covid_data.staging_table;
+FAILED: SemanticException Line 1:17 Invalid path ''/user/cloudera/ds/COVID_HDFS_LZ/covid-19/csv'': No files matching path hdfs://quickstart.cloudera:8020/user/cloudera/ds/COVID_HDFS_LZ/covid-19/csv
+hive> LOAD DATA INPATH '/user/cloudera/ds/COVID_HDFS_LZ/covid-19.csv' INTO TABLE covid_data.staging_table;
+Loading data to table covid_data.staging_table
+Table covid_data.staging_table stats: [numFiles=2, totalSize=41414]
+OK
+Time taken: 2.356 seconds
+hive> INSERT INTO TABLE covid_data.orc_table PARTITION (Country)
+    > SELECT
+    >     TotalCases,
+    >     ActiveCases,
+    >     DeathInClosedCases,
+    >     NewCases,
+    >     TotalDeaths,
+    >     NewDeaths,
+    >     TotalRecovered,
+    >     SeriousCritical,
+    >     DeathsPerMillion,
+    >     TotalTests,
+    >     CasesPerMillion,
+    >     RankByTestingRate,
+    >     RankByDeathRate,
+    >     RankByCasesRate,
+    >     TestsPerMillion,
+    >     RankByDeathOfClosedCases,
+    >     Country
+    > FROM
+    >     covid_data.staging_table;
+FAILED: SemanticException [Error 10096]: Dynamic partition strict mode requires at least one static partition column. To turn this off set hive.exec.dynamic.partition.mode=nonstrict
+hive> hive.exec.dynamic.partition.mode=nonstrict
+    > ;
+NoViableAltException(26@[])
+	at org.apache.hadoop.hive.ql.parse.HiveParser.statement(HiveParser.java:1028)
+	at org.apache.hadoop.hive.ql.parse.ParseDriver.parse(ParseDriver.java:201)
+	at org.apache.hadoop.hive.ql.parse.ParseDriver.parse(ParseDriver.java:166)
+	at org.apache.hadoop.hive.ql.Driver.compile(Driver.java:522)
+	at org.apache.hadoop.hive.ql.Driver.compileInternal(Driver.java:1356)
+	at org.apache.hadoop.hive.ql.Driver.runInternal(Driver.java:1473)
+	at org.apache.hadoop.hive.ql.Driver.run(Driver.java:1285)
+	at org.apache.hadoop.hive.ql.Driver.run(Driver.java:1275)
+	at org.apache.hadoop.hive.cli.CliDriver.processLocalCmd(CliDriver.java:226)
+	at org.apache.hadoop.hive.cli.CliDriver.processCmd(CliDriver.java:175)
+	at org.apache.hadoop.hive.cli.CliDriver.processLine(CliDriver.java:389)
+	at org.apache.hadoop.hive.cli.CliDriver.executeDriver(CliDriver.java:781)
+	at org.apache.hadoop.hive.cli.CliDriver.run(CliDriver.java:699)
+	at org.apache.hadoop.hive.cli.CliDriver.main(CliDriver.java:634)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.apache.hadoop.util.RunJar.run(RunJar.java:221)
+	at org.apache.hadoop.util.RunJar.main(RunJar.java:136)
+FAILED: ParseException line 1:0 cannot recognize input near 'hive' '.' 'exec'
+hive> INSERT INTO TABLE covid_data.orc_table PARTITION (Country)
+    > SELECT
+    >     TotalCases,
+    >     ActiveCases,
+    >     DeathInClosedCases,
+    >     NewCases,
+    >     TotalDeaths,
+    >     NewDeaths,
+    >     TotalRecovered,
+    >     SeriousCritical,
+    >     DeathsPerMillion,
+    >     TotalTests,
+    >     CasesPerMillion,
+    >     RankByTestingRate,
+    >     RankByDeathRate,
+    >     RankByCasesRate,
+    >     TestsPerMillion,
+    >     RankByDeathOfClosedCases,
+    >     Country
+    > FROM
+    >     covid_data.staging_table;
+FAILED: SemanticException [Error 10096]: Dynamic partition strict mode requires at least one static partition column. To turn this off set hive.exec.dynamic.partition.mode=nonstrict
+hive> SET hive.exec.dynamic.partition = true;
+hive> SET hive.exec.dynamic.partition = true;
+hive> INSERT INTO TABLE covid_data.orc_table PARTITION (Country)
+    > SELECT
+    >     TotalCases,
+    >     ActiveCases,
+    >     DeathInClosedCases,
+    >     NewCases,
+    >     TotalDeaths,
+    >     NewDeaths,
+    >     TotalRecovered,
+    >     SeriousCritical,
+    >     DeathsPerMillion,
+    >     TotalTests,
+    >     CasesPerMillion,
+    >     RankByTestingRate,
+    >     RankByDeathRate,
+    >     RankByCasesRate,
+    >     TestsPerMillion,
+    >     RankByDeathOfClosedCases,
+    >     Country
+    > FROM
+    >     covid_data.staging_table;
+FAILED: SemanticException [Error 10096]: Dynamic partition strict mode requires at least one static partition column. To turn this off set hive.exec.dynamic.partition.mode=nonstrict
+hive> set hive.exec.dynamic.partition.mode=nonstrict
+    > ;
+hive> INSERT INTO TABLE covid_data.orc_table PARTITION (Country)
+    > SELECT
+    >     TotalCases,
+    >     ActiveCases,
+    >     DeathInClosedCases,
+    >     NewCases,
+    >     TotalDeaths,
+    >     NewDeaths,
+    >     TotalRecovered,
+    >     SeriousCritical,
+    >     DeathsPerMillion,
+    >     TotalTests,
+    >     CasesPerMillion,
+    >     RankByTestingRate,
+    >     RankByDeathRate,
+    >     RankByCasesRate,
+    >     TestsPerMillion,
+    >     RankByDeathOfClosedCases,
+    >     Country
+    > FROM
+    >     covid_data.staging_table;
+Query ID = root_20240321171111_52962453-a0c4-454f-a599-01a48929f5b2
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1711064159550_0001, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1711064159550_0001/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1711064159550_0001
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2024-03-21 17:12:08,881 Stage-1 map = 0%,  reduce = 0%
+2024-03-21 17:13:11,603 Stage-1 map = 0%,  reduce = 0%, Cumulative CPU 2.01 sec
+2024-03-21 17:14:12,899 Stage-1 map = 0%,  reduce = 0%
+2024-03-21 17:14:32,956 Stage-1 map = 100%,  reduce = 0%
+MapReduce Total cumulative CPU time: 2 seconds 10 msec
+Ended Job = job_1711064159550_0001 with errors
+Error during job, obtaining debugging information...
+Job Tracking URL: http://quickstart.cloudera:8088/proxy/application_1711064159550_0001/
+Examining task ID: task_1711064159550_0001_m_000000 (and more) from job job_1711064159550_0001
+
+Task with the most failures(4): 
+-----
+Task ID:
+  task_1711064159550_0001_m_000000
+
+URL:
+  http://0.0.0.0:8088/taskdetails.jsp?jobid=job_1711064159550_0001&tipid=task_1711064159550_0001_m_000000
+-----
+Diagnostic Messages for this Task:
+Error: Java heap space
+
+FAILED: Execution Error, return code 2 from org.apache.hadoop.hive.ql.exec.mr.MapRedTask
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 2.01 sec   HDFS Read: 0 HDFS Write: 0 FAIL
+Total MapReduce CPU Time Spent: 2 seconds 10 msec
+hive> CREATE TABLE IF NOT EXISTS covid_data.final_table (
+    >     Country VARCHAR(255),
+    >     TotalCases INT,
+    >     ActiveCases INT,
+    >     DeathInClosedCases INT,
+    >     NewCases INT,
+    >     TotalDeaths INT,
+    >     NewDeaths INT,
+    >     TotalRecovered INT,
+    >     SeriousCritical INT,
+    >     DeathsPerMillion FLOAT,
+    >     TotalTests INT,
+    >     CasesPerMillion FLOAT,
+    >     RankByTestingRate INT,
+    >     RankByDeathRate INT,
+    >     RankByCasesRate INT,
+    >     TestsPerMillion FLOAT,
+    >     RankByDeathOfClosedCases INT
+    > )
+    > STORED AS TEXTFILE;
+OK
+Time taken: 8.685 seconds
+hive> quit
+    > ;
+WARN: The method class org.apache.commons.logging.impl.SLF4JLogFactory#release() was invoked.
+WARN: Please see http://www.slf4j.org/codes.html#release for an explanation.
+[root@quickstart sf_shared]# oozie job -run -config job.properties
+java.lang.IllegalArgumentException: Oozie URL is not available neither in command option or in the environment
+	at org.apache.oozie.cli.OozieCLI.getOozieUrl(OozieCLI.java:702)
+	at org.apache.oozie.cli.OozieCLI.createXOozieClient(OozieCLI.java:907)
+	at org.apache.oozie.cli.OozieCLI.jobCommand(OozieCLI.java:950)
+	at org.apache.oozie.cli.OozieCLI.processCommand(OozieCLI.java:664)
+	at org.apache.oozie.cli.OozieCLI.run(OozieCLI.java:617)
+	at org.apache.oozie.cli.OozieCLI.main(OozieCLI.java:218)
+Oozie URL is not available neither in command option or in the environment
+[root@quickstart sf_shared]# oozie job -run
+java.lang.IllegalArgumentException: Oozie URL is not available neither in command option or in the environment
+	at org.apache.oozie.cli.OozieCLI.getOozieUrl(OozieCLI.java:702)
+	at org.apache.oozie.cli.OozieCLI.createXOozieClient(OozieCLI.java:907)
+	at org.apache.oozie.cli.OozieCLI.jobCommand(OozieCLI.java:950)
+	at org.apache.oozie.cli.OozieCLI.processCommand(OozieCLI.java:664)
+	at org.apache.oozie.cli.OozieCLI.run(OozieCLI.java:617)
+	at org.apache.oozie.cli.OozieCLI.main(OozieCLI.java:218)
+Oozie URL is not available neither in command option or in the environment
+[root@quickstart sf_shared]# oozie
+Invalid sub-command: missing sub-command
+
+use 'help [sub-command]' for help details
+[root@quickstart sf_shared]# 
+
